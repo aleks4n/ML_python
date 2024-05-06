@@ -23,7 +23,7 @@ def sigmoid(z):
 
 
 
-def logistic_regressionn(X, y, learning_rate=0.1, num_iterations=50, lambda_=0.01):
+def logistic_regressionn(X, y, learning_rate=0.01, num_iterations=250000, lambda_=0.01):
     m, n = X.shape
     theta = np.zeros(n)
     theta_0 = 0

@@ -36,28 +36,24 @@ def split(df):
     return X_train, X_test, Y_train, Y_test
 
 
-def gradientDescent(theta, theta_0, alpha, X, y, iteration, reg_param=0.00001):
+def gradientDescent(theta, theta_0, alpha, X, y, iteration, reg_param=0):
     m = len(y)
    
     loss_history = []
 
+    
+
     for i in range(iteration):
         predict = theta_0 + X.dot(theta)
     
-        loss_history.append((1/(2*m))*np.sum(np.square(predict-y))*reg_param)
-        theta = theta - alpha * (1/m)*(X.T.dot(predict-y))
+        loss_history.append(1/(2*m)*np.sum(np.square(predict-y))+reg_param*np.linalg.norm(theta)**2)
+        #theta = theta - alpha * ((1/m)*X.T.dot(predict-y))
+        theta = theta - alpha * ((1/m)*X.T.dot(predict-y)+[element * reg_param for element in theta])
         theta_0 = theta_0 - alpha * (1/m)*np.sum(predict-y)
 
     return theta, theta_0, loss_history
 
-
-
-
-
 X_train, X_test, Y_train, Y_test = split(df)
-
-
-
 # Create a scaler object
 scaler = StandardScaler()
 
@@ -81,17 +77,18 @@ Y_train = scaler_Y.transform(Y_train).ravel()
 
 
 # Now 'data' is a list of lists, where each inner list represents a row from the first 7 columns of the CSV file
-theta, theta_0, loss_history = gradientDescent(theta, theta_0, alpha, X_train, Y_train, 1000)
+theta, theta_0, loss_history = gradientDescent(theta, theta_0, alpha, X_train, Y_train, 10000)
 
 Y_pred = X_test.dot(theta) + theta_0
-print(theta_0)
 Y_pred = np.array(Y_pred).reshape(-1, 1)
 Y_pred = scaler_Y.inverse_transform(Y_pred)
-print(Y_test)
-fig1 = plt.figure(200)
+fig1 = plt.figure('Regularization Parameter 0')
 plt.plot(Y_pred,label='Predicted')
 plt.plot(Y_test.values,label='Actual') #Giving Y_test.values instead of Y_test because Y_test is a pandas series and it gives the indices
+fig2 = plt.figure('Loss Over Iterations')
+plt.plot(loss_history, label='Loss Over Iterations')
 
 plt.legend()
 
 plt.show()
+print(theta)
